@@ -21,7 +21,7 @@ import io.spring.initializr.generator.project.ProjectDescription;
 import io.spring.initializr.generator.project.ProjectDescriptionCustomizer;
 import io.spring.initializr.generator.version.Version;
 import io.spring.initializr.web.AbstractInitializrControllerIntegrationTests;
-import io.spring.initializr.web.project.ProjectGenerationPostProcessorTests.ProjectRequestPostProcessorConfiguration;
+import io.spring.initializr.web.project.ProjectGenerationDescriptionCustomizerTests.ProjectDescriptionCustomizerConfiguration;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.context.annotation.Bean;
@@ -30,21 +30,19 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
 @ActiveProfiles("test-default")
-@Import(ProjectRequestPostProcessorConfiguration.class)
-class ProjectGenerationPostProcessorTests
+@Import(ProjectDescriptionCustomizerConfiguration.class)
+class ProjectGenerationDescriptionCustomizerTests
 		extends AbstractInitializrControllerIntegrationTests {
 
-	// TODO: rename test class
-
 	@Test
-	void postProcessorsInvoked() {
+	void projectDescriptionCustomizersAreInvoked() {
 		downloadZip("/starter.zip?bootVersion=2.0.4.RELEASE&javaVersion=1.8")
 				.isJavaProject().isMavenProject().pomAssert()
 				.hasSpringBootParent("2.2.3.RELEASE").hasProperty("java.version", "1.7");
 	}
 
 	@Configuration
-	static class ProjectRequestPostProcessorConfiguration {
+	static class ProjectDescriptionCustomizerConfiguration {
 
 		@Bean
 		public ProjectDescriptionCustomizer secondPostProcessor() {
