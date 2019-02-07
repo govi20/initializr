@@ -19,9 +19,6 @@ package io.spring.initializr.web.project;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.spring.initializr.metadata.InitializrMetadata;
-
-import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.util.StringUtils;
 
 /**
@@ -186,19 +183,6 @@ public class ProjectRequest {
 
 	public void setBaseDir(String baseDir) {
 		this.baseDir = baseDir;
-	}
-
-	public void initialize(InitializrMetadata metadata) {
-		BeanWrapperImpl bean = new BeanWrapperImpl(this);
-		metadata.defaults().forEach((key, value) -> {
-			if (bean.isWritableProperty(key)) {
-				// We want to be able to infer a package name if none has been
-				// explicitly set
-				if (!key.equals("packageName")) {
-					bean.setPropertyValue(key, value);
-				}
-			}
-		});
 	}
 
 }

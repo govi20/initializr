@@ -70,7 +70,8 @@ class ProjectRequestDocumentFactoryTests {
 	@Test
 	void createDocumentWithNonWebProjectRequest() {
 		ProjectRequest request = new ProjectRequest();
-		request.initialize(this.metadata);
+		request.setBootVersion("2.1.0.RELEASE");
+		request.setType("maven-build");
 		ProjectGeneratedEvent event = createProjectGeneratedEvent(request);
 		ProjectRequestDocument document = this.factory.createDocument(event);
 		assertThat(document.getClient()).isNull();

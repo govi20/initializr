@@ -155,7 +155,6 @@ public class ProjectGenerationInvokerTests {
 	@SuppressWarnings("unchecked")
 	void createDistributionDirectory(@TempDir Path tempDir) {
 		ProjectRequest request = new ProjectRequest();
-		request.initialize(metadata);
 		request.setType("gradle-project");
 		File dir = tempDir.toFile();
 		File distributionFile = this.invoker.createDistributionFile(dir, ".zip");

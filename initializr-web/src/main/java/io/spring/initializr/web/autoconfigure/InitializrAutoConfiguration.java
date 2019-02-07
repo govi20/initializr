@@ -70,8 +70,6 @@ import org.springframework.web.servlet.resource.ResourceUrlProvider;
 		RestTemplateAutoConfiguration.class })
 public class InitializrAutoConfiguration {
 
-	// Bridge to new API
-
 	@Bean
 	@ConditionalOnMissingBean
 	public ProjectDirectoryFactory projectDirectoryFactory() {
@@ -83,7 +81,6 @@ public class InitializrAutoConfiguration {
 	public IndentingWriterFactory indentingWriterFactory() {
 		return IndentingWriterFactory.create(new SimpleIndentStrategy("\t"));
 	}
-	// End of bridge to new API
 
 	@Bean
 	@ConditionalOnMissingBean

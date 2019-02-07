@@ -101,7 +101,7 @@ public class MainController extends AbstractInitializrController {
 	}
 
 	@ModelAttribute
-	public WebProjectRequest projectRequest(@RequestHeader Map<String, String> headers) {
+	public ProjectRequest projectRequest(@RequestHeader Map<String, String> headers) {
 		WebProjectRequest request = new WebProjectRequest();
 		request.getParameters().putAll(headers);
 		request.initialize(this.metadataProvider.get());
@@ -242,7 +242,7 @@ public class MainController extends AbstractInitializrController {
 
 	@RequestMapping(path = { "/pom", "/pom.xml" })
 	@ResponseBody
-	public ResponseEntity<byte[]> pom(WebProjectRequest request) {
+	public ResponseEntity<byte[]> pom(ProjectRequest request) {
 		request.setType("maven-build");
 		byte[] mavenPom = this.projectGenerationInvoker.invokeBuildGeneration(request);
 		return createResponseEntity(mavenPom, "application/octet-stream", "pom.xml");
@@ -250,7 +250,7 @@ public class MainController extends AbstractInitializrController {
 
 	@RequestMapping(path = { "/build", "/build.gradle" })
 	@ResponseBody
-	public ResponseEntity<byte[]> gradle(WebProjectRequest request) {
+	public ResponseEntity<byte[]> gradle(ProjectRequest request) {
 		request.setType("gradle-build");
 		byte[] gradleBuild = this.projectGenerationInvoker.invokeBuildGeneration(request);
 		return createResponseEntity(gradleBuild, "application/octet-stream",
@@ -259,8 +259,7 @@ public class MainController extends AbstractInitializrController {
 
 	@RequestMapping("/starter.zip")
 	@ResponseBody
-	public ResponseEntity<byte[]> springZip(WebProjectRequest request)
-			throws IOException {
+	public ResponseEntity<byte[]> springZip(ProjectRequest request) throws IOException {
 		File dir = this.projectGenerationInvoker
 				.invokeProjectStructureGeneration(request);
 		File download = this.projectGenerationInvoker.createDistributionFile(dir, ".zip");
@@ -288,8 +287,7 @@ public class MainController extends AbstractInitializrController {
 
 	@RequestMapping(path = "/starter.tgz", produces = "application/x-compress")
 	@ResponseBody
-	public ResponseEntity<byte[]> springTgz(WebProjectRequest request)
-			throws IOException {
+	public ResponseEntity<byte[]> springTgz(ProjectRequest request) throws IOException {
 		File dir = this.projectGenerationInvoker
 				.invokeProjectStructureGeneration(request);
 		File download = this.projectGenerationInvoker.createDistributionFile(dir,
@@ -318,7 +316,7 @@ public class MainController extends AbstractInitializrController {
 				"application/x-compress");
 	}
 
-	private static String generateFileName(WebProjectRequest request, String extension) {
+	private static String generateFileName(ProjectRequest request, String extension) {
 		String tmp = request.getArtifactId().replaceAll(" ", "_");
 		try {
 			return URLEncoder.encode(tmp, "UTF-8") + "." + extension;

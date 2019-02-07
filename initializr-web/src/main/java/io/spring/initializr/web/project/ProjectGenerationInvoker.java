@@ -76,7 +76,7 @@ public class ProjectGenerationInvoker {
 	 * @param request the project request
 	 * @return the generated project structure
 	 */
-	public File invokeProjectStructureGeneration(WebProjectRequest request) {
+	public File invokeProjectStructureGeneration(ProjectRequest request) {
 		InitializrMetadata metadata = this.parentApplicationContext
 				.getBean(InitializrMetadataProvider.class).get();
 		try {
@@ -98,7 +98,7 @@ public class ProjectGenerationInvoker {
 		}
 	}
 
-	private ProjectAssetGenerator<Path> generateProject(WebProjectRequest request) {
+	private ProjectAssetGenerator<Path> generateProject(ProjectRequest request) {
 		return (context) -> {
 			Path projectDir = new DefaultProjectAssetGenerator().generate(context);
 			publishProjectGeneratedEvent(request, context);
@@ -113,7 +113,7 @@ public class ProjectGenerationInvoker {
 	 * @param request the project request
 	 * @return the generated build content
 	 */
-	public byte[] invokeBuildGeneration(WebProjectRequest request) {
+	public byte[] invokeBuildGeneration(ProjectRequest request) {
 		InitializrMetadata metadata = this.parentApplicationContext
 				.getBean(InitializrMetadataProvider.class).get();
 		try {
@@ -130,7 +130,7 @@ public class ProjectGenerationInvoker {
 		}
 	}
 
-	private ProjectAssetGenerator<byte[]> generateBuild(WebProjectRequest request) {
+	private ProjectAssetGenerator<byte[]> generateBuild(ProjectRequest request) {
 		return (context) -> {
 			byte[] content = generateBuild(context);
 			publishProjectGeneratedEvent(request, context);
@@ -198,7 +198,7 @@ public class ProjectGenerationInvoker {
 				() -> new MetadataBuildItemResolver(metadata));
 	}
 
-	private void publishProjectGeneratedEvent(WebProjectRequest request,
+	private void publishProjectGeneratedEvent(ProjectRequest request,
 			ProjectGenerationContext context) {
 		Build build = context.getBeanProvider(Build.class).getIfAvailable();
 		InitializrMetadata metadata = context.getBean(InitializrMetadata.class);
@@ -206,7 +206,7 @@ public class ProjectGenerationInvoker {
 		this.eventPublisher.publishEvent(event);
 	}
 
-	private void publishProjectFailedEvent(WebProjectRequest request,
+	private void publishProjectFailedEvent(ProjectRequest request,
 			InitializrMetadata metadata, Exception cause) {
 		ProjectFailedEvent event = new ProjectFailedEvent(request, metadata, cause);
 		this.eventPublisher.publishEvent(event);

@@ -23,7 +23,6 @@ import io.spring.initializr.generator.version.Version;
 import io.spring.initializr.metadata.InitializrMetadata;
 import io.spring.initializr.test.metadata.InitializrMetadataTestBuilder;
 import io.spring.initializr.web.InvalidProjectRequestException;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -36,19 +35,14 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
  */
 public class ProjectRequestToDescriptionConverterTests {
 
-	private ProjectRequestToDescriptionConverter converter;
+	private InitializrMetadata metadata = InitializrMetadataTestBuilder.withDefaults()
+			.build();
 
-	private InitializrMetadata metadata;
-
-	@BeforeEach
-	void setup() {
-		this.metadata = InitializrMetadataTestBuilder.withDefaults().build();
-		this.converter = new ProjectRequestToDescriptionConverter();
-	}
+	private final ProjectRequestToDescriptionConverter converter = new ProjectRequestToDescriptionConverter();
 
 	@Test
 	public void convertWhenTypeIsInvalidShouldThrowException() {
-		ProjectRequest request = getRequest();
+		ProjectRequest request = getProjectRequest();
 		request.setType("foo-build");
 		assertThatExceptionOfType(InvalidProjectRequestException.class)
 				.isThrownBy(() -> this.converter.convert(request, this.metadata))
@@ -57,7 +51,7 @@ public class ProjectRequestToDescriptionConverterTests {
 
 	@Test
 	void convertWhenSpringBootVersionInvalidShouldThrowException() {
-		ProjectRequest request = getRequest();
+		ProjectRequest request = getProjectRequest();
 		request.setBootVersion("1.2.3.M4");
 		assertThatExceptionOfType(InvalidProjectRequestException.class)
 				.isThrownBy(() -> this.converter.convert(request, this.metadata))
@@ -67,7 +61,7 @@ public class ProjectRequestToDescriptionConverterTests {
 
 	@Test
 	public void convertWhenPackagingIsInvalidShouldThrowException() {
-		ProjectRequest request = getRequest();
+		ProjectRequest request = getProjectRequest();
 		request.setPackaging("star");
 		assertThatExceptionOfType(InvalidProjectRequestException.class)
 				.isThrownBy(() -> this.converter.convert(request, this.metadata))
@@ -76,7 +70,7 @@ public class ProjectRequestToDescriptionConverterTests {
 
 	@Test
 	public void convertWhenLanguageIsInvalidShouldThrowException() {
-		ProjectRequest request = getRequest();
+		ProjectRequest request = getProjectRequest();
 		request.setLanguage("english");
 		assertThatExceptionOfType(InvalidProjectRequestException.class)
 				.isThrownBy(() -> this.converter.convert(request, this.metadata))
@@ -85,7 +79,7 @@ public class ProjectRequestToDescriptionConverterTests {
 
 	@Test
 	void convertWhenDependencyNotPresentShouldThrowException() {
-		ProjectRequest request = getRequest();
+		ProjectRequest request = getProjectRequest();
 		request.setDependencies(Collections.singletonList("invalid"));
 		assertThatExceptionOfType(InvalidProjectRequestException.class)
 				.isThrownBy(() -> this.converter.convert(request, this.metadata))
@@ -174,17 +168,9 @@ public class ProjectRequestToDescriptionConverterTests {
 		assertThat(description.getLanguage().jvmVersion()).isEqualTo("1.8");
 	}
 
-	private ProjectRequest getRequest() {
-		ProjectRequest request = new ProjectRequest();
-		request.initialize(this.metadata);
-		return request;
-	}
-
 	private ProjectRequest getProjectRequest() {
-		ProjectRequest request = getRequest();
-		request.setLanguage("java");
-		request.setPackaging("jar");
-		request.setType("maven-build");
+		WebProjectRequest request = new WebProjectRequest();
+		request.initialize(this.metadata);
 		return request;
 	}
 
