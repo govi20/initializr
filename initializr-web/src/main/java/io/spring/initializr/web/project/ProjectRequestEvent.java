@@ -27,14 +27,13 @@ import io.spring.initializr.metadata.InitializrMetadata;
  */
 public abstract class ProjectRequestEvent {
 
-	private final WebProjectRequest request;
+	private final ProjectRequest request;
 
 	private final InitializrMetadata metadata;
 
 	private final long timestamp;
 
-	protected ProjectRequestEvent(WebProjectRequest request,
-			InitializrMetadata metadata) {
+	protected ProjectRequestEvent(ProjectRequest request, InitializrMetadata metadata) {
 		this.request = request;
 		this.metadata = metadata;
 		this.timestamp = System.currentTimeMillis();
@@ -44,7 +43,7 @@ public abstract class ProjectRequestEvent {
 	 * Return the {@link ProjectRequest} used to generate the project.
 	 * @return the project request
 	 */
-	public WebProjectRequest getProjectRequest() {
+	public ProjectRequest getProjectRequest() {
 		return this.request;
 	}
 

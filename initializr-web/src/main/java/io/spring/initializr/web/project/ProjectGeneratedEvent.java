@@ -25,7 +25,7 @@ import io.spring.initializr.metadata.InitializrMetadata;
  */
 public class ProjectGeneratedEvent extends ProjectRequestEvent {
 
-	public ProjectGeneratedEvent(WebProjectRequest request, InitializrMetadata metadata) {
+	public ProjectGeneratedEvent(ProjectRequest request, InitializrMetadata metadata) {
 		super(request, metadata);
 	}
 

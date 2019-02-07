@@ -18,8 +18,11 @@ package io.spring.initializr.actuate.stat;
 
 import java.util.Arrays;
 
+import io.spring.initializr.metadata.InitializrMetadata;
+import io.spring.initializr.test.metadata.InitializrMetadataTestBuilder;
 import io.spring.initializr.web.project.ProjectFailedEvent;
 import io.spring.initializr.web.project.ProjectGeneratedEvent;
+import io.spring.initializr.web.project.ProjectRequest;
 import io.spring.initializr.web.project.WebProjectRequest;
 import org.junit.jupiter.api.Test;
 
@@ -30,13 +33,19 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @author Stephane Nicoll
  */
-class ProjectRequestDocumentFactoryTests extends AbstractInitializrStatTests {
+class ProjectRequestDocumentFactoryTests {
+
+	private final InitializrMetadata metadata = InitializrMetadataTestBuilder
+			.withDefaults().addDependencyGroup("core", "security", "validation", "aop")
+			.addDependencyGroup("web", "web", "data-rest", "jersey")
+			.addDependencyGroup("data", "data-jpa", "jdbc")
+			.addDependencyGroup("database", "h2", "mysql").build();
 
 	private final ProjectRequestDocumentFactory factory = new ProjectRequestDocumentFactory();
 
 	@Test
 	void createDocumentForSimpleProject() {
-		WebProjectRequest request = createProjectRequest();
+		ProjectRequest request = createProjectRequest();
 		ProjectGeneratedEvent event = createProjectGeneratedEvent(request);
 		ProjectRequestDocument document = this.factory.createDocument(event);
 		assertThat(document.getArtifactId()).isEqualTo("demo");
@@ -56,6 +65,15 @@ class ProjectRequestDocumentFactoryTests extends AbstractInitializrStatTests {
 		assertThat(document.getVersion().getId()).isEqualTo("2.1.1.RELEASE");
 		assertThat(document.getVersion().getMajor()).isEqualTo("2");
 		assertThat(document.getVersion().getMinor()).isEqualTo("2.1");
+	}
+
+	@Test
+	void createDocumentWithNonWebProjectRequest() {
+		ProjectRequest request = new ProjectRequest();
+		request.initialize(this.metadata);
+		ProjectGeneratedEvent event = createProjectGeneratedEvent(request);
+		ProjectRequestDocument document = this.factory.createDocument(event);
+		assertThat(document.getClient()).isNull();
 	}
 
 	@Test
@@ -141,7 +159,7 @@ class ProjectRequestDocumentFactoryTests extends AbstractInitializrStatTests {
 
 	@Test
 	void createDocumentInvalidJavaVersion() {
-		WebProjectRequest request = createProjectRequest();
+		ProjectRequest request = createProjectRequest();
 		request.setJavaVersion("1.2");
 		ProjectGeneratedEvent event = createProjectGeneratedEvent(request);
 		ProjectRequestDocument document = this.factory.createDocument(event);
@@ -156,7 +174,7 @@ class ProjectRequestDocumentFactoryTests extends AbstractInitializrStatTests {
 
 	@Test
 	void createDocumentInvalidLanguage() {
-		WebProjectRequest request = createProjectRequest();
+		ProjectRequest request = createProjectRequest();
 		request.setLanguage("c++");
 		ProjectGeneratedEvent event = createProjectGeneratedEvent(request);
 		ProjectRequestDocument document = this.factory.createDocument(event);
@@ -171,7 +189,7 @@ class ProjectRequestDocumentFactoryTests extends AbstractInitializrStatTests {
 
 	@Test
 	void createDocumentInvalidPackaging() {
-		WebProjectRequest request = createProjectRequest();
+		ProjectRequest request = createProjectRequest();
 		request.setPackaging("ear");
 		ProjectGeneratedEvent event = createProjectGeneratedEvent(request);
 		ProjectRequestDocument document = this.factory.createDocument(event);
@@ -186,7 +204,7 @@ class ProjectRequestDocumentFactoryTests extends AbstractInitializrStatTests {
 
 	@Test
 	void createDocumentInvalidType() {
-		WebProjectRequest request = createProjectRequest();
+		ProjectRequest request = createProjectRequest();
 		request.setType("ant-project");
 		ProjectGeneratedEvent event = createProjectGeneratedEvent(request);
 		ProjectRequestDocument document = this.factory.createDocument(event);
@@ -201,7 +219,7 @@ class ProjectRequestDocumentFactoryTests extends AbstractInitializrStatTests {
 
 	@Test
 	void createDocumentInvalidDependency() {
-		WebProjectRequest request = createProjectRequest();
+		ProjectRequest request = createProjectRequest();
 		request.setDependencies(Arrays.asList("web", "invalid", "data-jpa", "invalid-2"));
 		ProjectGeneratedEvent event = createProjectGeneratedEvent(request);
 		ProjectRequestDocument document = this.factory.createDocument(event);
@@ -220,8 +238,8 @@ class ProjectRequestDocumentFactoryTests extends AbstractInitializrStatTests {
 
 	@Test
 	void createDocumentWithProjectFailedEvent() {
-		WebProjectRequest request = createProjectRequest();
-		ProjectFailedEvent event = new ProjectFailedEvent(request, getMetadata(),
+		ProjectRequest request = createProjectRequest();
+		ProjectFailedEvent event = new ProjectFailedEvent(request, this.metadata,
 				new IllegalStateException("my test message"));
 		ProjectRequestDocument document = this.factory.createDocument(event);
 		assertThat(document.getErrorState().isInvalid()).isTrue();
@@ -233,8 +251,14 @@ class ProjectRequestDocumentFactoryTests extends AbstractInitializrStatTests {
 		assertThat(document.getErrorState().getMessage()).isEqualTo("my test message");
 	}
 
-	private ProjectGeneratedEvent createProjectGeneratedEvent(WebProjectRequest request) {
-		return new ProjectGeneratedEvent(request, getMetadata());
+	private WebProjectRequest createProjectRequest() {
+		WebProjectRequest request = new WebProjectRequest();
+		request.initialize(this.metadata);
+		return request;
+	}
+
+	private ProjectGeneratedEvent createProjectGeneratedEvent(ProjectRequest request) {
+		return new ProjectGeneratedEvent(request, this.metadata);
 	}
 
 }

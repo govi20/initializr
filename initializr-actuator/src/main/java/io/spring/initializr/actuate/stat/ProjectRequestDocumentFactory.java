@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2018 the original author or authors.
+ * Copyright 2012-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,12 +41,9 @@ import org.springframework.util.StringUtils;
  */
 public class ProjectRequestDocumentFactory {
 
-	public ProjectRequestDocumentFactory() {
-	}
-
 	public ProjectRequestDocument createDocument(ProjectRequestEvent event) {
 		InitializrMetadata metadata = event.getMetadata();
-		WebProjectRequest request = event.getProjectRequest();
+		ProjectRequest request = event.getProjectRequest();
 		ProjectRequestDocument document = new ProjectRequestDocument();
 		document.setGenerationTimestamp(event.getTimestamp());
 		document.setGroupId(request.getGroupId());
@@ -120,12 +117,15 @@ public class ProjectRequestDocumentFactory {
 		return null;
 	}
 
-	private ClientInformation determineClientInformation(WebProjectRequest request) {
-		Agent agent = determineAgent(request);
-		String ip = determineIp(request);
-		String country = determineCountry(request);
-		if (agent != null || ip != null || country != null) {
-			return new ClientInformation(agent, ip, country);
+	private ClientInformation determineClientInformation(ProjectRequest request) {
+		if (request instanceof WebProjectRequest) {
+			WebProjectRequest webProjectRequest = (WebProjectRequest) request;
+			Agent agent = determineAgent(webProjectRequest);
+			String ip = determineIp(webProjectRequest);
+			String country = determineCountry(webProjectRequest);
+			if (agent != null || ip != null || country != null) {
+				return new ClientInformation(agent, ip, country);
+			}
 		}
 		return null;
 	}
